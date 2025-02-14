@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "schichtplan-tool"
+name = "shift-schedule-generator"
 version = "0.1.0"
