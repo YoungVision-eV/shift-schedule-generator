@@ -5,14 +5,14 @@ pub struct Shift {
 }
 
 pub fn fill_schedule(
-    schedule: &Vec<&Vec<Shift>>,
+    schedule: &Vec<Vec<Shift>>,
     people: &Vec<String>,
 ) -> Vec<Vec<(String, Vec<String>)>> {
     let mut i_people = 0;
     let mut result = Vec::new();
     for day in schedule {
         let mut result_day = Vec::new();
-        for shift in *day {
+        for shift in day {
             let mut result_shift = (shift.name.clone(), Vec::new());
             for _ in 0..shift.people {
                 result_shift.1.push(people[i_people].clone()); //TODO: Try to remove this clone, bc it may be unecessary and to learn about rust lifetime
