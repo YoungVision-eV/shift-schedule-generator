@@ -66,6 +66,6 @@ fn main() {
             people: 2,
         },
     ];
-    let schedule = fill_schedule(&vec![&first_day, &day, &day, &last_day], names);
+    let schedule = fill_schedule(&vec![&first_day, &day, &day, &last_day], &names);
     print_schedule(schedule);
 }

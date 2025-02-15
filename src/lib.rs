@@ -6,7 +6,7 @@ pub struct Shift {
 
 pub fn fill_schedule(
     schedule: &Vec<&Vec<Shift>>,
-    people: Vec<String>,
+    people: &Vec<String>,
 ) -> Vec<Vec<(String, Vec<String>)>> {
     let mut i_people = 0;
     let mut result = Vec::new();
@@ -113,17 +113,32 @@ mod tests {
                 people: 2,
             },
         ];
-        let schedule = fill_schedule(&vec![&first_day, &day, &day, &last_day], names);
+        let schedule = fill_schedule(&vec![&first_day, &day, &day, &last_day], &names);
         let flat_schedule = schedule.concat();
-        assert!(!duplicates(flat_schedule))
+        assert!(!double_asignments(flat_schedule.clone()));
+        assert!(fair_distribution(flat_schedule, names));
     }
 
-    fn duplicates(schedule: Vec<(String, Vec<String>)>) -> bool {
+    fn double_asignments(schedule: Vec<(String, Vec<String>)>) -> bool {
         for shift in schedule {
             if shift.1.len() > HashSet::<String>::from_iter(shift.1).len() {
                 return true;
             }
         }
         false
+    }
+
+    fn fair_distribution(schedule: Vec<(String, Vec<String>)>, names: Vec<String>) -> bool {
+        let list = schedule
+            .iter()
+            .map(|s| s.1.clone())
+            .collect::<Vec<Vec<String>>>()
+            .concat();
+        let mut shift_quantities: Vec<usize> = names
+            .iter()
+            .map(|name| list.iter().filter(|l| *l == name).count())
+            .collect();
+        shift_quantities.sort();
+        *shift_quantities.first().unwrap() >= *shift_quantities.last().unwrap() - 1
     }
 }
