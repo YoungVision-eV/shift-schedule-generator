@@ -42,6 +42,8 @@ pub fn print_schedule(schedule: Vec<Vec<(String, Vec<String>)>>) {
 
 #[cfg(test)]
 mod tests {
+    use std::collections::HashSet;
+
     use super::*;
 
     #[test]
@@ -112,5 +114,16 @@ mod tests {
             },
         ];
         let schedule = fill_schedule(&vec![&first_day, &day, &day, &last_day], names);
+        let flat_schedule = schedule.concat();
+        assert!(!duplicates(flat_schedule))
+    }
+
+    fn duplicates(schedule: Vec<(String, Vec<String>)>) -> bool {
+        for shift in schedule {
+            if shift.1.len() > HashSet::<String>::from_iter(shift.1).len() {
+                return true;
+            }
+        }
+        false
     }
 }
