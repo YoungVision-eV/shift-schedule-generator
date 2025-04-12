@@ -36,7 +36,5 @@ pub fn parse_args() -> (Vec<String>, Vec<Vec<Shift>>) {
         },
     ];
     let args = Cli::parse();
-    println!("{:?}", args.names);
-    println!("{:?}", args.days);
     (args.names, vec![day; args.days])
 }

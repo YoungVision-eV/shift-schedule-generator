@@ -28,7 +28,7 @@ pub fn fill_schedule(
     result
 }
 
-pub fn print_schedule(schedule: Vec<Vec<(String, Vec<String>)>>) {
+pub fn print_schedule(schedule: &Vec<Vec<(String, Vec<String>)>>) {
     for (i, day) in schedule.iter().enumerate() {
         if i > 0 {
             println!();
@@ -38,6 +38,53 @@ pub fn print_schedule(schedule: Vec<Vec<(String, Vec<String>)>>) {
             println!("{}: {:?}", shift.0, shift.1)
         }
     }
+}
+
+pub fn print_schedule_md(schedule: &Vec<Vec<(String, Vec<String>)>>) {
+    print!("| ");
+    for i in 0..schedule.len() {
+        print!("| Tag {} ", i);
+    }
+    println!("|");
+    for _ in 0..schedule.len() + 1 {
+        print!("| -------- ");
+    }
+    println!("|");
+    for i in 0..schedule[0].len() {
+        print!("| {} ", schedule[0][i].0);
+        for day in schedule {
+            print!("| {} ", day[i].1.join(", "));
+        }
+        println!("|");
+    }
+}
+
+pub fn print_schedule_html(schedule: &Vec<Vec<(String, Vec<String>)>>) {
+    println!(
+        "<style>
+table, th, td {{
+  border:1px solid black;
+}}
+</style>"
+    );
+    println!("<table>");
+    println!("  <tr>");
+    println!("    <th></th>");
+    for i in 0..schedule.len() {
+        println!("    <th>Tag {}</th>", i);
+    }
+    println!("  </tr>");
+    for i in 0..schedule[0].len() {
+        println!("  <tr>");
+        println!("    <td><strong>{}</strong></td>", schedule[0][i].0);
+        for day in schedule {
+            let people_list = day[i].1.join(", ");
+            println!("    <td>{}</td>", people_list);
+        }
+        println!("  </tr>");
+    }
+
+    println!("</table>");
 }
 
 #[cfg(test)]
@@ -113,7 +160,7 @@ mod tests {
                 people: 2,
             },
         ];
-        let schedule = fill_schedule(&vec![&first_day, &day, &day, &last_day], &names);
+        let schedule = fill_schedule(&vec![first_day, day.clone(), day.clone(), last_day], &names);
         let flat_schedule = schedule.concat();
         assert!(!double_asignments(flat_schedule.clone()));
         assert!(fair_distribution(flat_schedule, names));
