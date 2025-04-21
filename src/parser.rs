@@ -35,6 +35,15 @@ pub fn parse_args() -> (Vec<String>, Vec<Vec<Shift>>) {
             people: 2,
         },
     ];
+    let start = inquire::DateSelect::new("Pick a start date").prompt();
+    let end = inquire::DateSelect::new("Pick a end date").prompt();
+    let days;
+    match (start, end) {
+        (Ok(start), Ok(end)) => days = (end-start).num_days() + 1,
+        default => days = 0,
+    }
+
     let args = Cli::parse();
-    (args.names, vec![day; args.days])
+    
+    (args.names, vec![day; days as usize])
 }

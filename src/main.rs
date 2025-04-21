@@ -1,5 +1,6 @@
 use shift_schedule_generator::*;
 mod parser;
+mod schedule_table;
 
 fn main() {
     let args= parser::parse_args();
