@@ -1,5 +1,6 @@
 use chrono::{NaiveDate, Duration};
 use std::collections::{HashMap};
+use std::fmt;
 
 #[derive(Clone)]
 pub enum Shift {
@@ -7,6 +8,17 @@ pub enum Shift {
     Disabled,
     Empty(usize),
     Filled(Vec<String>),
+}
+
+impl fmt::Display for Shift {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Shift::Unkown => write!(f, "?"),
+            Shift::Disabled => write!(f, " / "),
+            Shift::Empty(n) => write!(f, "{} empty slots", n),
+            Shift::Filled(people) => write!(f, "{}", people.join(", ")),
+        }
+    }
 }
 
 struct Day {
@@ -61,7 +73,7 @@ impl ScheduleTable {
             .collect()
     }
 
-    pub fn iter_days(&self) -> impl Iterator<Item = NaiveDate> {
+    pub fn iter_dates(&self) -> impl Iterator<Item = NaiveDate> {
         let mut current = self.first_day;
         let end = self.last_day;
 
@@ -74,5 +86,9 @@ impl ScheduleTable {
                 Some(today)
             }
         })
+    }
+
+    pub fn get_shift(&self, index_day: usize, index_shift: usize) -> Shift {
+        self.data[index_day][index_shift].clone()
     }
 }

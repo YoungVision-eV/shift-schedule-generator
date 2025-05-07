@@ -1,11 +1,16 @@
+use chrono::Datelike;
+use schedule_table::ScheduleTable;
+
+mod schedule_table;
+
 #[derive(Debug, Clone, Default)]
-pub struct Shift {
+pub struct DeprecatedShift {
     pub name: String,
     pub people: usize,
 }
 
 pub fn fill_schedule(
-    schedule: &Vec<Vec<Shift>>,
+    schedule: &Vec<Vec<DeprecatedShift>>,
     people: &Vec<String>,
 ) -> Vec<Vec<(String, Vec<String>)>> {
     let mut i_people = 0;
@@ -40,20 +45,20 @@ pub fn print_schedule(schedule: &Vec<Vec<(String, Vec<String>)>>) {
     }
 }
 
-pub fn print_schedule_md(schedule: &Vec<Vec<(String, Vec<String>)>>) {
+pub fn print_schedule_md(schedule: ScheduleTable) {
     print!("| ");
-    for i in 0..schedule.len() {
-        print!("| Tag {} ", i);
+    for d in schedule.iter_dates() {
+        print!("| {} {}.{}. ", d.weekday(), d.day(), d.month());
     }
     println!("|");
-    for _ in 0..schedule.len() + 1 {
+    for _ in schedule.iter_dates() {
         print!("| -------- ");
     }
     println!("|");
-    for i in 0..schedule[0].len() {
-        print!("| {} ", schedule[0][i].0);
-        for day in schedule {
-            print!("| {} ", day[i].1.join(", "));
+    for i in 0..schedule.shift_labels.len() {
+        print!("| {} ", schedule.shift_labels[i]);
+        for j in 0..schedule.iter_dates().collect::<Vec<_>>().len() {
+            print!("| {} ", schedule.get_shift(j, i));
         }
         println!("|");
     }
@@ -106,56 +111,56 @@ mod tests {
             String::from("Heidi"),
         ];
 
-        let day: Vec<Shift> = vec![
-            Shift {
+        let day: Vec<DeprecatedShift> = vec![
+            DeprecatedShift {
                 name: String::from("breakfast preparing"),
                 people: 3,
             },
-            Shift {
+            DeprecatedShift {
                 name: String::from("washing dishes"),
                 people: 2,
             },
-            Shift {
+            DeprecatedShift {
                 name: String::from("cook lunch"),
                 people: 3,
             },
-            Shift {
+            DeprecatedShift {
                 name: String::from("washing dishes"),
                 people: 2,
             },
-            Shift {
+            DeprecatedShift {
                 name: String::from("dinner"),
                 people: 3,
             },
-            Shift {
+            DeprecatedShift {
                 name: String::from("washing dishes"),
                 people: 2,
             },
         ];
-        let first_day: Vec<Shift> = vec![
-            Shift {
+        let first_day: Vec<DeprecatedShift> = vec![
+            DeprecatedShift {
                 name: String::from("dinner"),
                 people: 3,
             },
-            Shift {
+            DeprecatedShift {
                 name: String::from("washing dishes"),
                 people: 2,
             },
         ];
-        let last_day: Vec<Shift> = vec![
-            Shift {
+        let last_day: Vec<DeprecatedShift> = vec![
+            DeprecatedShift {
                 name: String::from("breakfast preparing"),
                 people: 2,
             },
-            Shift {
+            DeprecatedShift {
                 name: String::from("washing dishes"),
                 people: 2,
             },
-            Shift {
+            DeprecatedShift {
                 name: String::from("cook lunch"),
                 people: 3,
             },
-            Shift {
+            DeprecatedShift {
                 name: String::from("washing dishes"),
                 people: 2,
             },
