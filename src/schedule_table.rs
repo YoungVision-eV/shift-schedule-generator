@@ -70,9 +70,9 @@ impl ScheduleTable {
     }
 
     pub fn get_shift(&self, index_day: usize, index_shift: usize) -> Shift {
-        match (self.data.get(index_day)).unwrap_or(&Vec::default()).get(index_shift) {
-            Some(s) => s.clone(),
-            None => Shift::Unkown,
-        }
+        self.data.get(index_day)
+            .and_then(|day| day.get(index_shift))
+            .cloned()
+            .unwrap_or(Shift::Unkown)
     }
 }

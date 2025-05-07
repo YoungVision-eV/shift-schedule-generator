@@ -20,7 +20,7 @@ fn prompt_disabled_shifts(schedule: &ScheduleTable) {
     .prompt();
     let selected_days = match ans {
         Ok(d) => d,
-        Err(_) => todo!("unhandled error"),
+        Err(_) => return,
     };
     let shift_choices: Vec<_> = selected_days
         .iter()
@@ -33,14 +33,14 @@ fn prompt_disabled_shifts(schedule: &ScheduleTable) {
     let ans = MultiSelect::new("Select shifts to disable.", shift_choices).prompt();
     let selected_shifts = match ans {
         Ok(s) => s,
-        Err(_) => todo!("unhandled error"),
+        Err(_) => return,
     };
     println!("{:?}", selected_shifts);
 }
 
 pub fn parse_args() -> ScheduleTable {
-    let first_day = DateSelect::new("Pick a start date").prompt();
-    let last_day = DateSelect::new("Pick a end date").prompt();
+    let first_day = DateSelect::new("Pick a start date").prompt().expect("Error: invalid first_day");
+    let last_day = DateSelect::new("Pick a end date").with_min_date(first_day).prompt().expect("Error, invalid last_day");
     let prompt_n_shifts = CustomType::<usize>::new("How many shifts per day?")
         .with_error_message("Please type a valid number")
         .prompt();
@@ -63,14 +63,12 @@ pub fn parse_args() -> ScheduleTable {
         shift_sizes.push(n_people.expect("Error: invalid n_people"));
     }
     let schedule = ScheduleTable::new(
-        first_day.expect("Error: invalid first_day"),
-        last_day.expect("Error, invalid last_day"),
+        first_day,
+        last_day,
         shift_labels,
         shift_sizes,
     );
     prompt_disabled_shifts(&schedule);
-
-    let args = Cli::parse();
 
     schedule
 }
