@@ -1,7 +1,5 @@
 use chrono::Datelike;
-use schedule_table::ScheduleTable;
-
-mod schedule_table;
+use crate::schedule_table::ScheduleTable;
 
 #[derive(Debug, Clone, Default)]
 pub struct DeprecatedShift {
@@ -45,12 +43,13 @@ pub fn print_schedule(schedule: &Vec<Vec<(String, Vec<String>)>>) {
     }
 }
 
-pub fn print_schedule_md(schedule: ScheduleTable) {
+pub fn print_schedule_md(schedule: &ScheduleTable) {
     print!("| ");
     for d in schedule.iter_dates() {
         print!("| {} {}.{}. ", d.weekday(), d.day(), d.month());
     }
     println!("|");
+    print!("| -------- ");
     for _ in schedule.iter_dates() {
         print!("| -------- ");
     }

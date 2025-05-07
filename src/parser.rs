@@ -12,7 +12,7 @@ struct Cli {
 }
 
 fn prompt_disabled_shifts(schedule: &ScheduleTable) {
-    let all_days = schedule.iter_days().collect();
+    let all_days = schedule.iter_dates().collect();
     let ans = MultiSelect::new(
         "Select days one which you want to disable shifts: ",
         all_days,

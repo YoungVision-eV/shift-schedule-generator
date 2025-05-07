@@ -21,11 +21,6 @@ impl fmt::Display for Shift {
     }
 }
 
-struct Day {
-    date: NaiveDate,
-    shifts: Vec<Shift>,
-}
-
 pub struct ScheduleTable {
     /**
      The 2D Vec holding the data for the table i.e the Shifts with the names
@@ -52,25 +47,11 @@ impl ScheduleTable {
         }
         let shifts = shift_sizes.iter().map(|s| Shift::Empty(*s)).collect();
         Self {
-            data: vec![shifts; (last_day - first_day).num_days() as usize],
+            data: vec![shifts; ((last_day - first_day).num_days() + 1) as usize],
             shift_labels,
             first_day,
             last_day,
         }
-    }
-    //TODO: rethink this method
-    pub fn get_days(&self, index: usize) -> Vec<Day> {
-        self.data
-            .iter()
-            .enumerate()
-            .map(|(i, column)| Day {
-                date: self
-                    .first_day
-                    .checked_add_days(chrono::Days::new(i as u64))
-                    .expect("Date out of range."),
-                shifts: column.clone(),
-            })
-            .collect()
     }
 
     pub fn iter_dates(&self) -> impl Iterator<Item = NaiveDate> {
@@ -89,6 +70,9 @@ impl ScheduleTable {
     }
 
     pub fn get_shift(&self, index_day: usize, index_shift: usize) -> Shift {
-        self.data[index_day][index_shift].clone()
+        match (self.data.get(index_day)).unwrap_or(&Vec::default()).get(index_shift) {
+            Some(s) => s.clone(),
+            None => Shift::Unkown,
+        }
     }
 }
