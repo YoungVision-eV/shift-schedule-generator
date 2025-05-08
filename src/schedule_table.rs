@@ -1,6 +1,6 @@
 use chrono::{NaiveDate, Duration};
 use std::collections::{HashMap};
-use std::fmt;
+use std::{fmt, usize};
 
 #[derive(Clone)]
 pub enum Shift {
@@ -74,5 +74,13 @@ impl ScheduleTable {
             .and_then(|day| day.get(index_shift))
             .cloned()
             .unwrap_or(Shift::Unkown)
+    }
+    
+    pub fn disable_shift(&mut self, index_day: usize, index_shift: usize) {
+        if let Some(day) = self.data.get_mut(index_day) {
+            if let Some(shift) = day.get_mut(index_shift) {
+                *shift = Shift::Disabled;
+            }
+        }
     }
 }

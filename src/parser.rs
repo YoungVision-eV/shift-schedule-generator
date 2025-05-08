@@ -1,6 +1,6 @@
 use clap::{error, Parser};
 use inquire::{CustomType, DateSelect, MultiSelect, Text};
-use std::process::exit;
+use std::{collections::HashMap, process::exit};
 
 use crate::schedule_table::{ScheduleTable, Shift};
 
@@ -11,7 +11,7 @@ struct Cli {
     days: Option<usize>,
 }
 
-fn prompt_disabled_shifts(schedule: &ScheduleTable) {
+fn prompt_disabled_shifts(schedule: &mut ScheduleTable) {
     let all_days = schedule.iter_dates().collect();
     let ans = MultiSelect::new(
         "Select days one which you want to disable shifts: ",
@@ -30,12 +30,15 @@ fn prompt_disabled_shifts(schedule: &ScheduleTable) {
                 .map(move |s| format!("{}: Shift {}", d, s))
         })
         .collect();
-    let ans = MultiSelect::new("Select shifts to disable.", shift_choices).prompt();
+    let ans = MultiSelect::new("Select shifts to disable.", shift_choices.clone()).prompt();
     let selected_shifts = match ans {
         Ok(s) => s,
         Err(_) => return,
     };
-    println!("{:?}", selected_shifts);
+    for selected in selected_shifts {
+        let pos = shift_choices.iter().position(|s| *s == selected).unwrap();
+        schedule.disable_shift(pos / schedule.shift_labels.len(), pos % schedule.shift_labels.len());
+    }
 }
 
 pub fn parse_args() -> ScheduleTable {
@@ -62,13 +65,13 @@ pub fn parse_args() -> ScheduleTable {
             .prompt();
         shift_sizes.push(n_people.expect("Error: invalid n_people"));
     }
-    let schedule = ScheduleTable::new(
+    let mut schedule = ScheduleTable::new(
         first_day,
         last_day,
         shift_labels,
         shift_sizes,
     );
-    prompt_disabled_shifts(&schedule);
+    prompt_disabled_shifts(&mut schedule);
 
     schedule
 }
