@@ -49,9 +49,9 @@ pub fn print_schedule_md(schedule: &ScheduleTable) {
         print!("| {} {}.{}. ", d.weekday(), d.day(), d.month());
     }
     println!("|");
-    print!("| -------- ");
+    print!("| --------: ");
     for _ in schedule.iter_dates() {
-        print!("| -------- ");
+        print!("| :--------: ");
     }
     println!("|");
     for i in 0..schedule.shift_labels.len() {

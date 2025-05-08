@@ -11,33 +11,38 @@ struct Cli {
     days: Option<usize>,
 }
 
+/**
+ * Prompts the user which shifts to disable and then disables them
+ */
 fn prompt_disabled_shifts(schedule: &mut ScheduleTable) {
-    let all_days = schedule.iter_dates().collect();
+    let all_days: Vec<_> = schedule.iter_dates().collect();
     let ans = MultiSelect::new(
         "Select days one which you want to disable shifts: ",
-        all_days,
+        all_days.clone(),
     )
     .prompt();
     let selected_days = match ans {
         Ok(d) => d,
         Err(_) => return,
     };
-    let shift_choices: Vec<_> = selected_days
+    let shift_options: Vec<_> = selected_days
         .iter()
         .flat_map(|d| {
             schedule.shift_labels
                 .iter()
-                .map(move |s| format!("{}: Shift {}", d, s))
+                .map(move |s| format!("{}: {}", d, s))
         })
         .collect();
-    let ans = MultiSelect::new("Select shifts to disable.", shift_choices.clone()).prompt();
+    let ans = MultiSelect::new("Select shifts to disable.", shift_options.clone()).prompt();
     let selected_shifts = match ans {
         Ok(s) => s,
         Err(_) => return,
     };
     for selected in selected_shifts {
-        let pos = shift_choices.iter().position(|s| *s == selected).unwrap();
-        schedule.disable_shift(pos / schedule.shift_labels.len(), pos % schedule.shift_labels.len());
+        let pos = shift_options.iter().position(|s| *s == selected).unwrap();
+        let day = selected_days[pos / schedule.shift_labels.len()];
+        let index_day = all_days.iter().position(|d| *d == day).unwrap();
+        schedule.disable_shift(index_day, pos % schedule.shift_labels.len());
     }
 }
 
