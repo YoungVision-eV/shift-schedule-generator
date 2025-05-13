@@ -7,9 +7,9 @@ use crate::schedule_table::{ScheduleTable, Shift};
 
 #[derive(clap::Parser)]
 struct Cli {
-    #[arg(short, long)]
+    #[arg(short, long, value_name="YYYY-MM-DD")]
     first_date: Option<NaiveDate>,
-    #[arg(short, long)]
+    #[arg(short, long, value_name="YYYY-MM-DD")]
     last_date: Option<NaiveDate>,
     names: Vec<String>,
 }
@@ -61,13 +61,19 @@ pub fn parse_args() -> (ScheduleTable, Vec<String>) {
             args.names.push(name);
         }
     }
-    let first_day = DateSelect::new("Pick a start date")
-        .prompt()
-        .expect("Error: invalid first_day");
-    let last_day = DateSelect::new("Pick a end date")
-        .with_min_date(first_day)
-        .prompt()
-        .expect("Error, invalid last_day");
+    let first_day = match args.first_date {
+        Some(d) => d,
+        None => DateSelect::new("Pick a start date")
+            .prompt()
+            .expect("Error: invalid first_day"),
+    };
+    let last_day = match args.last_date {
+        Some(d) => d,
+        None => DateSelect::new("Pick a end date")
+            .with_min_date(first_day)
+            .prompt()
+            .expect("Error, invalid last_day"),
+    };
     let prompt_n_shifts = CustomType::<usize>::new("How many shifts per day?")
         .with_error_message("Please type a valid number")
         .prompt();
