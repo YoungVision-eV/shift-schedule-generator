@@ -1,3 +1,4 @@
+use chrono::NaiveDate;
 use clap::{error, Parser};
 use inquire::{CustomType, DateSelect, MultiSelect, Text};
 use std::{collections::HashMap, process::exit};
@@ -6,9 +7,11 @@ use crate::schedule_table::{ScheduleTable, Shift};
 
 #[derive(clap::Parser)]
 struct Cli {
-    names: Vec<String>,
     #[arg(short, long)]
-    days: Option<usize>,
+    first_date: Option<NaiveDate>,
+    #[arg(short, long)]
+    last_date: Option<NaiveDate>,
+    names: Vec<String>,
 }
 
 /**
@@ -46,7 +49,8 @@ fn prompt_disabled_shifts(schedule: &mut ScheduleTable) {
     }
 }
 
-pub fn parse_args() -> ScheduleTable {
+pub fn parse_args() -> (ScheduleTable, Vec<String>) {
+    let args = Cli::parse();
     let first_day = DateSelect::new("Pick a start date").prompt().expect("Error: invalid first_day");
     let last_day = DateSelect::new("Pick a end date").with_min_date(first_day).prompt().expect("Error, invalid last_day");
     let prompt_n_shifts = CustomType::<usize>::new("How many shifts per day?")
@@ -78,5 +82,5 @@ pub fn parse_args() -> ScheduleTable {
     );
     prompt_disabled_shifts(&mut schedule);
 
-    schedule
+    (schedule, args.names)
 }

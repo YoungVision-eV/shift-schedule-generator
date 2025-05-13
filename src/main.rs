@@ -1,10 +1,10 @@
-mod process;
 mod parser;
+mod process;
 mod schedule_table;
-pub use crate::{schedule_table::ScheduleTable, process::*};
+pub use crate::{process::*, schedule_table::ScheduleTable};
 
 fn main() {
-    let schedule: ScheduleTable = parser::parse_args();
-    // let schedule = fill_schedule(&args.1, &args.0);
+    let (mut schedule, people) = parser::parse_args();
+    schedule.fill_schedule(&people);
     print_schedule_html(&schedule);
 }

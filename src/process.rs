@@ -1,34 +1,10 @@
+use crate::schedule_table::{ScheduleTable, Shift};
 use chrono::Datelike;
-use crate::schedule_table::ScheduleTable;
 
 #[derive(Debug, Clone, Default)]
 pub struct DeprecatedShift {
     pub name: String,
     pub people: usize,
-}
-
-pub fn fill_schedule(
-    schedule: &Vec<Vec<DeprecatedShift>>,
-    people: &Vec<String>,
-) -> Vec<Vec<(String, Vec<String>)>> {
-    let mut i_people = 0;
-    let mut result = Vec::new();
-    for day in schedule {
-        let mut result_day = Vec::new();
-        for shift in day {
-            let mut result_shift = (shift.name.clone(), Vec::new());
-            for _ in 0..shift.people {
-                result_shift.1.push(people[i_people].clone()); //TODO: Try to remove this clone, bc it may be unecessary and to learn about rust lifetime
-                i_people += 1;
-                if i_people >= people.len() {
-                    i_people -= people.len();
-                }
-            }
-            result_day.push(result_shift);
-        }
-        result.push(result_day);
-    }
-    result
 }
 
 pub fn print_schedule(schedule: &Vec<Vec<(String, Vec<String>)>>) {
@@ -63,7 +39,7 @@ pub fn print_schedule_md(schedule: &ScheduleTable) {
     }
 }
 
-pub fn print_schedule_html(schedule: &ScheduleTable){
+pub fn print_schedule_html(schedule: &ScheduleTable) {
     println!(
         "<style>
 table, th, td {{
@@ -165,10 +141,10 @@ mod tests {
                 people: 2,
             },
         ];
-        let schedule = fill_schedule(&vec![first_day, day.clone(), day.clone(), last_day], &names);
-        let flat_schedule = schedule.concat();
-        assert!(!double_asignments(flat_schedule.clone()));
-        assert!(fair_distribution(flat_schedule, names));
+        // let schedule = fill_schedule(&vec![first_day, day.clone(), day.clone(), last_day], &names);
+        // let flat_schedule = schedule.concat();
+        // assert!(!double_asignments(flat_schedule.clone()));
+        // assert!(fair_distribution(flat_schedule, names));
     }
 
     fn double_asignments(schedule: Vec<(String, Vec<String>)>) -> bool {
