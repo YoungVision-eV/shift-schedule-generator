@@ -56,34 +56,35 @@ pub fn print_schedule_md(schedule: &ScheduleTable) {
     println!("|");
     for i in 0..schedule.shift_labels.len() {
         print!("| {} ", schedule.shift_labels[i]);
-        for j in 0..schedule.iter_dates().collect::<Vec<_>>().len() {
+        for j in 0..schedule.iter_dates().count() {
             print!("| {} ", schedule.get_shift(j, i));
         }
         println!("|");
     }
 }
 
-pub fn print_schedule_html(schedule: &Vec<Vec<(String, Vec<String>)>>) {
+pub fn print_schedule_html(schedule: &ScheduleTable){
     println!(
         "<style>
 table, th, td {{
   border:1px solid black;
+  padding: 0.25rem;
+  text-align: center;
 }}
 </style>"
     );
     println!("<table>");
     println!("  <tr>");
     println!("    <th></th>");
-    for i in 0..schedule.len() {
-        println!("    <th>Tag {}</th>", i);
+    for d in schedule.iter_dates() {
+        println!("    <th>{} {}.{}.</th>", d.weekday(), d.day(), d.month());
     }
     println!("  </tr>");
-    for i in 0..schedule[0].len() {
+    for (i, label) in schedule.shift_labels.iter().enumerate() {
         println!("  <tr>");
-        println!("    <td><strong>{}</strong></td>", schedule[0][i].0);
-        for day in schedule {
-            let people_list = day[i].1.join(", ");
-            println!("    <td>{}</td>", people_list);
+        println!("    <td><strong>{}</strong></td>", label);
+        for j in 0..schedule.iter_dates().count() {
+            println!("    <td>{}</td>", schedule.get_shift(j, i));
         }
         println!("  </tr>");
     }
