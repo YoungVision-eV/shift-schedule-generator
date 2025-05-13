@@ -31,7 +31,8 @@ fn prompt_disabled_shifts(schedule: &mut ScheduleTable) {
     let shift_options: Vec<_> = selected_days
         .iter()
         .flat_map(|d| {
-            schedule.shift_labels
+            schedule
+                .shift_labels
                 .iter()
                 .map(move |s| format!("{}: {}", d, s))
         })
@@ -50,9 +51,23 @@ fn prompt_disabled_shifts(schedule: &mut ScheduleTable) {
 }
 
 pub fn parse_args() -> (ScheduleTable, Vec<String>) {
-    let args = Cli::parse();
-    let first_day = DateSelect::new("Pick a start date").prompt().expect("Error: invalid first_day");
-    let last_day = DateSelect::new("Pick a end date").with_min_date(first_day).prompt().expect("Error, invalid last_day");
+    let mut args = Cli::parse();
+    if args.names.len() == 0 {
+        eprintln!("Enter a list of Names seperated by <Enter>. Enter empty name or Press Ctrl+D to finish the list.");
+        while let Ok(name) = Text::new("").prompt() {
+            if name.len() == 0 {
+                break;
+            }
+            args.names.push(name);
+        }
+    }
+    let first_day = DateSelect::new("Pick a start date")
+        .prompt()
+        .expect("Error: invalid first_day");
+    let last_day = DateSelect::new("Pick a end date")
+        .with_min_date(first_day)
+        .prompt()
+        .expect("Error, invalid last_day");
     let prompt_n_shifts = CustomType::<usize>::new("How many shifts per day?")
         .with_error_message("Please type a valid number")
         .prompt();
@@ -69,17 +84,13 @@ pub fn parse_args() -> (ScheduleTable, Vec<String>) {
     for _ in 0..n_shifts {
         let shift_label = Text::new("Title of the shift:").prompt();
         shift_labels.push(shift_label.expect("Error: invalid shift_title"));
-        let n_people: Result<usize, inquire::InquireError> = CustomType::<usize>::new("How many persons?")
-            .with_error_message("Please type a valid number")
-            .prompt();
+        let n_people: Result<usize, inquire::InquireError> =
+            CustomType::<usize>::new("How many persons?")
+                .with_error_message("Please type a valid number")
+                .prompt();
         shift_sizes.push(n_people.expect("Error: invalid n_people"));
     }
-    let mut schedule = ScheduleTable::new(
-        first_day,
-        last_day,
-        shift_labels,
-        shift_sizes,
-    );
+    let mut schedule = ScheduleTable::new(first_day, last_day, shift_labels, shift_sizes);
     prompt_disabled_shifts(&mut schedule);
 
     (schedule, args.names)
