@@ -1,9 +1,9 @@
 use chrono::NaiveDate;
-use clap::{error, Parser};
+use clap::{Parser};
 use inquire::{CustomType, DateSelect, MultiSelect, Text};
-use std::{collections::HashMap, process::exit};
+use std::{process::exit};
 
-use crate::schedule_table::{ScheduleTable, Shift};
+use crate::schedule_table::{ScheduleTable};
 
 #[derive(clap::Parser)]
 struct Cli {

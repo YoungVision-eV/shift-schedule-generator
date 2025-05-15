@@ -1,4 +1,4 @@
-use crate::schedule_table::{ScheduleTable, Shift};
+use crate::schedule_table::{ScheduleTable};
 use chrono::Datelike;
 
 #[derive(Debug, Clone, Default)]
