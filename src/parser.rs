@@ -1,7 +1,7 @@
 use chrono::NaiveDate;
 use clap::{Parser};
 use inquire::{CustomType, DateSelect, MultiSelect, Text};
-use std::{process::exit};
+use std::{path::PathBuf, process::exit};
 
 use crate::schedule_table::{ScheduleTable};
 
@@ -11,7 +11,22 @@ struct Cli {
     first_date: Option<NaiveDate>,
     #[arg(short, long, value_name="YYYY-MM-DD")]
     last_date: Option<NaiveDate>,
+    #[arg(long, value_name="FILE")]
+    csv: Option<PathBuf>,
+    #[arg(long, value_name="FILE")]
+    md: Option<PathBuf>,
+    #[arg(long, value_name="FILE")]
+    html: Option<PathBuf>,
     names: Vec<String>,
+}
+
+pub struct ParsedArgs {
+    first_date: NaiveDate,
+    last_date: NaiveDate,
+    pub csv_path: Option<PathBuf>,
+    pub md_path: Option<PathBuf>,
+    pub html_path: Option<PathBuf>,
+    pub names: Vec<String>,
 }
 
 /**
@@ -50,27 +65,38 @@ fn prompt_disabled_shifts(schedule: &mut ScheduleTable) {
     }
 }
 
-pub fn parse_args() -> (ScheduleTable, Vec<String>) {
-    let mut args = Cli::parse();
+pub fn parse_args() -> (ScheduleTable, ParsedArgs) {
+    let args = Cli::parse();
+    let mut result = ParsedArgs {
+        first_date: NaiveDate::from_ymd_opt(1970, 1, 1).unwrap(),
+        last_date: NaiveDate::from_ymd_opt(1970, 1, 1).unwrap(),
+        csv_path: args.csv,
+        md_path: args.md,
+        html_path: args.html,
+        names: Vec::new(),
+    };
     if args.names.len() == 0 {
         eprintln!("Enter a list of Names seperated by <Enter>. Enter empty name or Press Ctrl+D to finish the list.");
         while let Ok(name) = Text::new("").prompt() {
             if name.len() == 0 {
                 break;
             }
-            args.names.push(name);
+            result.names.push(name);
         }
     }
-    let first_day = match args.first_date {
+    else {
+        result.names = args.names;
+    }
+    result.first_date = match args.first_date {
         Some(d) => d,
         None => DateSelect::new("Pick a start date")
             .prompt()
             .expect("Error: invalid first_day"),
     };
-    let last_day = match args.last_date {
+    result.last_date = match args.last_date {
         Some(d) => d,
         None => DateSelect::new("Pick a end date")
-            .with_min_date(first_day)
+            .with_min_date(result.first_date)
             .prompt()
             .expect("Error, invalid last_day"),
     };
@@ -96,8 +122,7 @@ pub fn parse_args() -> (ScheduleTable, Vec<String>) {
                 .prompt();
         shift_sizes.push(n_people.expect("Error: invalid n_people"));
     }
-    let mut schedule = ScheduleTable::new(first_day, last_day, shift_labels, shift_sizes);
+    let mut schedule = ScheduleTable::new(result.first_date, result.last_date, shift_labels, shift_sizes);
     prompt_disabled_shifts(&mut schedule);
-
-    (schedule, args.names)
+    (schedule, result)
 }

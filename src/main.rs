@@ -1,10 +1,17 @@
 mod parser;
 mod process;
 mod schedule_table;
+use std::{fs::File, io::Write};
+
 pub use crate::{process::*, schedule_table::ScheduleTable};
 
 fn main() {
-    let (mut schedule, people) = parser::parse_args();
-    schedule.fill_schedule(&people);
-    print_schedule_csv(&schedule);
+    let (mut schedule, args) = parser::parse_args();
+    schedule.fill_schedule(&args.names);
+    if let Some(path) = args.csv_path {
+        match File::create(path) {
+            Ok(file) =>  print_schedule_csv(&schedule, &mut file),
+            Err(e) => eprintln!("{}", e),
+        };
+    }
 }

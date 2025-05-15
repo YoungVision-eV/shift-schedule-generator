@@ -39,19 +39,20 @@ pub fn print_schedule_md(schedule: &ScheduleTable) {
     }
 }
 
-pub fn print_schedule_csv(schedule: &ScheduleTable) {
-    print!("Shift, ");
+pub fn print_schedule_csv<W: std::io::Write>(schedule: &ScheduleTable, writer: &mut W) -> std::io::Result<()> {
+    write!(writer, "Shift, ")?;
     for d in schedule.iter_dates() {
-        print!("{}, ", d);
+        write!(writer, "{}, ", d)?;
     }
-    println!();
+    writeln!(writer)?;
     for i in 0..schedule.shift_labels.len() {
-        print!("\"{}\", ", schedule.shift_labels[i]);
+        write!(writer, "\"{}\", ", schedule.shift_labels[i])?;
         for j in 0..schedule.iter_dates().count() {
-            print!("\"{}\", ", schedule.get_shift(j, i));
+            write!(writer, "\"{}\", ", schedule.get_shift(j, i))?;
         }
-        println!();
+        writeln!(writer)?;
     }
+    Ok(())
 }
 
 pub fn print_schedule_html(schedule: &ScheduleTable) {
