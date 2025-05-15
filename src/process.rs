@@ -39,6 +39,21 @@ pub fn print_schedule_md(schedule: &ScheduleTable) {
     }
 }
 
+pub fn print_schedule_csv(schedule: &ScheduleTable) {
+    print!("Shift, ");
+    for d in schedule.iter_dates() {
+        print!("{}, ", d);
+    }
+    println!();
+    for i in 0..schedule.shift_labels.len() {
+        print!("\"{}\", ", schedule.shift_labels[i]);
+        for j in 0..schedule.iter_dates().count() {
+            print!("\"{}\", ", schedule.get_shift(j, i));
+        }
+        println!();
+    }
+}
+
 pub fn print_schedule_html(schedule: &ScheduleTable) {
     println!(
         "<style>
