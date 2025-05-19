@@ -10,7 +10,9 @@ fn main() {
     schedule.fill_schedule(&args.names);
     if let Some(path) = args.csv_path {
         match File::create(path) {
-            Ok(file) =>  print_schedule_csv(&schedule, &mut file),
+            Ok(mut file) => {
+                print_schedule_csv(&schedule, &mut file).inspect_err(|e| eprintln!("{}", e)).ok();
+            }
             Err(e) => eprintln!("{}", e),
         };
     }
